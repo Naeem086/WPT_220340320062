@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="jquery-3.5.1.min.js"></script>
+	<script>
+		$(() => {
+			$("#update").attr("disabled", "disabled");
+			$("#id").blur(() => {
+				let input = { bookid: $("#id").val() };
+				let connectserver = {
+					data: input,
+					url: "http://localhost:8081/getdetails",
+					type: 'get',
+					dataType: 'json',
+					success: (datafromserver) => {
+						if (input.bookid != "") {
+							if (datafromserver.bookid == input.bookid) {
+								$("#msg").text("Book ID is found");
+								$("#update").removeAttr("disabled");
+								$("#name").val(datafromserver.bookname);
+								$("#price").val(datafromserver.price);
+								$("#id").attr("disabled", "disabled");
+							} else if (datafromserver) {
+								$("#update").attr("disabled", "disabled");
+								$("#id").val(null);
+								$("#name").val(null);
+								$("#price").val(null);
+								$("#msg").text("Book ID not found");
+							}
+						} else {
+							$("#msg").text("Enter Book ID");
+						}
+					},
+					error: (datafromserver) => {
+						console.log("Update failed due to some issue..!");
+					}
+				}
+				$.ajax(connectserver);
+			});
+
+			$("#update").click(() => {
+				let input = { bookid: $("#id").val(), bookname: $("#name").val(), bookprice: $("#price").val() };
+				let connectserver = {
+					data: input,
+					url: "http://localhost:8081/updatedetails",
+					type: 'get',
+					dataType: 'json',
+					success: (datafromserver) => {
+						$("#id").removeAttr("disabled");
+						$("#id").val(null);
+						$("#name").val(null);
+						$("#price").val(null);
+						$("#msg").text("Details Updated");
+					},
+					error: (datafromserver) => {
+						console.log("Update Failed..!");
+					}
+				}
+				$.ajax(connectserver);
+			});
+
+		});
+	</script>
+</head>
+
+<body>
+	<span> Book Id <input type="number" min="0" placeholder="Enter ID" id="id" , name="bookid"></span>
+	<span id="msg"> Message (what happened to book details)</span><br><br>
+	<span> Book Name <input type="text" placeholder="Name" id="name" name="bookname"></span><br><br>
+	<span> Price <input type="number" min="0" placeholder="Price" id="price" name="bookprice"></span><br><br>
+	<button id="update"> Update Book </button>
+</body>
+
+</html>
